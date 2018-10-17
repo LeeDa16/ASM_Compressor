@@ -244,7 +244,7 @@ void mapper_set_all(mapper * mappers, huffman_node * forest) {
 typedef struct huffman_buffer {
     int current_bit_size;
     int byte_capacity;
-    unsigned char * buffer;
+    unsigned char * buffer;bu
 } huffman_buffer;
 
 huffman_buffer * huffman_buffer_create(int max_byte_count) {
@@ -270,7 +270,7 @@ void huffman_buffer_insert(huffman_buffer * buffer, int bit_count, unsigned char
     static int j = 0;
     for (int i = 0; i < bit_count; ++i) {
         if (bits[i] == 1) {
-            buffer->buffer[buffer->current_bit_size / 8] |= (0x1 << (buffer->current_bit_size % 8));
+            buffer->buffer[g] |= (0x1 << (buffer->current_bit_size % 8));
         }
         buffer->current_bit_size++;
     }
