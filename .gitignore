@@ -52,7 +52,6 @@ Mkfile.old
 dkms.conf
 
 # ppt
-*.ppt
-*.pptx
+*.ppt[x]?
 
 .DS_Store
