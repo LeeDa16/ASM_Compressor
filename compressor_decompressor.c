@@ -7,6 +7,8 @@
 
 // ------------------------------------------------------------------------------------------
 
+#pragma pack(1)
+
 typedef struct huffman_node {
     unsigned char key;
     int weight;
@@ -14,131 +16,138 @@ typedef struct huffman_node {
     struct huffman_node * right_child;
 } huffman_node;
 
-huffman_node * huffman_node_create_external_node(int n) {
-    huffman_node * node = (huffman_node *)malloc(sizeof(huffman_node));
-    node->key = (unsigned char)n;
-    node->weight = 0;
-    node->left_child = NULL;
-    node->right_child = NULL;
-    return node;
-}
+extern huffman_node * huffman_node_create_external_node(int n);
+//huffman_node * huffman_node_create_external_node(int n) {
+//    huffman_node * node = (huffman_node *)malloc(sizeof(huffman_node));
+//    node->key = (unsigned char)n;
+//    node->weight = 0;
+//    node->left_child = NULL;
+//    node->right_child = NULL;
+//    return node;
+//}
 
-huffman_node * huffman_node_create_internal_node(huffman_node * left_child, huffman_node * right_child) {
-    huffman_node * node = (huffman_node *)malloc(sizeof(huffman_node));
-    node->key = (unsigned char)0;
-    node->weight = left_child->weight + right_child->weight;
-    node->left_child = left_child;
-    node->right_child = right_child;
-    return node;
-}
+extern huffman_node * huffman_node_create_internal_node(huffman_node * left_child, huffman_node * right_child);
+//huffman_node * huffman_node_create_internal_node(huffman_node * left_child, huffman_node * right_child) {
+//    huffman_node * node = (huffman_node *)malloc(sizeof(huffman_node));
+//    node->key = (unsigned char)0;
+//    node->weight = left_child->weight + right_child->weight;
+//    node->left_child = left_child;
+//    node->right_child = right_child;
+//    return node;
+//}
 
-void huffman_node_destory(huffman_node * node) {
-    if (node) {
-        free(node);
-    }
-}
+extern void huffman_node_destory(huffman_node * node);
+//void huffman_node_destory(huffman_node * node) {
+//    if (node) {
+//        free(node);
+//    }
+//}
 
 // ------------------------------------------------------------------------------------------
 
-#define  in_heap(n, i)          ( ( ( -1 ) < ( i ) ) && ( ( i ) < ( n ) ) ) // ï¿½Ð¶ï¿½q[i]ï¿½Ç·ï¿½Ï·ï¿½
-#define  parent(i)              ( ( i - 1 ) >> 1 ) // q[i]ï¿½Ä¸ï¿½ï¿½Úµã£¨floor((i-1)/2)ï¿½ï¿½iï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-#define  last_internal(n)       parent( n - 1 ) // ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½Ú²ï¿½ï¿½Úµã£¨ï¿½ï¿½Ä©ï¿½Úµï¿½Ä¸ï¿½ï¿½×£ï¿½
-#define  lchild(i)              ( 1 + ( ( i ) << 1 ) ) // q[i]ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-#define  rchild(i)              ( ( 1 + ( i ) ) << 1 ) // q[i]ï¿½ï¿½ï¿½Òºï¿½ï¿½ï¿½
-#define  parent_valid(i)        ( 0 < i ) // ï¿½Ð¶ï¿½q[i]ï¿½Ç·ï¿½ï¿½Ð¸ï¿½ï¿½ï¿½
-#define  lchild_valid(n, i)     in_heap( n, lchild( i ) ) // ï¿½Ð¶ï¿½q[i]ï¿½Ç·ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½ï¿½ó£©ºï¿½ï¿½ï¿½
-#define  rchild_valid(n, i)     in_heap( n, rchild( i ) ) // ï¿½Ð¶ï¿½q[i]ï¿½Ç·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-#define  bigger(q, i, j)        ( q->nodes[j]->weight < q->nodes[i]->weight ? j : i ) // È¡ï¿½ï¿½ï¿½ß£ï¿½ï¿½ï¿½Ê±Ç°ï¿½ï¿½ï¿½ï¿½ï¿½È£ï¿½
-#define  properparent(q, n, i) /* ï¿½ï¿½ï¿½Ó£ï¿½ï¿½ï¿½ï¿½à£©ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄ´ï¿½ï¿½ï¿½ */ \
+#define  in_heap(n, i)          ( ( ( -1 ) < ( i ) ) && ( ( i ) < ( n ) ) ) // ÅÐ¶Ïq[i]ÊÇ·ñºÏ·¨
+#define  parent(i)              ( ( i - 1 ) >> 1 ) // q[i]µÄ¸¸½Úµã£¨floor((i-1)/2)£¬iÎÞÂÛÕý¸º£©
+#define  last_internal(n)       parent( n - 1 ) // ×îºóÒ»¸öÄÚ²¿½Úµã£¨¼´Ä©½ÚµãµÄ¸¸Ç×£©
+#define  lchild(i)              ( 1 + ( ( i ) << 1 ) ) // q[i]µÄ×óº¢×Ó
+#define  rchild(i)              ( ( 1 + ( i ) ) << 1 ) // q[i]µÄÓÒº¢×Ó
+#define  parent_valid(i)        ( 0 < i ) // ÅÐ¶Ïq[i]ÊÇ·ñÓÐ¸¸Ç×
+#define  lchild_valid(n, i)     in_heap( n, lchild( i ) ) // ÅÐ¶Ïq[i]ÊÇ·ñÓÐÒ»¸ö£¨×ó£©º¢×Ó
+#define  rchild_valid(n, i)     in_heap( n, rchild( i ) ) // ÅÐ¶Ïq[i]ÊÇ·ñÓÐÁ½¸öº¢×Ó
+#define  bigger(q, i, j)        ( q->nodes[j]->weight < q->nodes[i]->weight ? j : i ) // È¡´óÕß£¨µÈÊ±Ç°ÕßÓÅÏÈ£©
+#define  properparent(q, n, i) /* ¸¸×Ó£¨ÖÁ¶à£©ÈýÕßÖÐµÄ´óÕß */ \
             ( rchild_valid(n, i) ? bigger( q, bigger( q, i, lchild(i) ), rchild(i) ) : \
             ( lchild_valid(n, i) ? bigger( q, i, lchild(i) ) : i \
             ) \
-            ) // ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½È£ï¿½ï¿½ï¿½Ë¿É±ï¿½ï¿½â²»ï¿½ï¿½Òªï¿½Ä½ï¿½ï¿½ï¿½
+            ) // ÏàµÈÊ±¸¸½ÚµãÓÅÏÈ£¬Èç´Ë¿É±ÜÃâ²»±ØÒªµÄ½»»»
 
 typedef struct priority_queue {
     int size;
     huffman_node * nodes[256];
 } pq;
 
-pq * pq_create() {
-    pq * q = (pq *)malloc(sizeof(pq));
-    for (int i = 0; i < 256; ++i) {
-        q->nodes[i] = NULL;
-    }
-    q->size = 0;
-    return q;
-}
+extern pq * pq_create();
+//pq * pq_create() {
+//    pq * q = (pq *)malloc(sizeof(pq));
+//    for (int i = 0; i < 256; ++i) {
+//        q->nodes[i] = NULL;
+//    }
+//    q->size = 0;
+//    return q;
+//}
 
-void pq_destory(pq * q) {
-    for (int i = 0; i < q->size; ++i) {
-        huffman_node_destory(q->nodes[i]);
-    }
-    free(q);
-}
+extern void pq_destory(pq * q);
+//void pq_destory(pq * q) {
+//    for (int i = 0; i < q->size; ++i) {
+//        huffman_node_destory(q->nodes[i]);
+//    }
+//    free(q);
+//}
 
-huffman_node * pq_getmax(pq * q) {
-    return q->nodes[0];
-}
+extern int pq_percolate_up(pq * q, int i);
+//// ¶ÔÏòÁ¿ÖÐµÄµÚ i ¸ö´ÊÌõÊµÊ©ÉÏÂË²Ù×÷£¬i < size£¬·µ»ØÉÏÂË×îÖÕµÖ´ïµÄÎ»ÖÃ
+//int pq_percolate_up(pq * q, int i) {
+//    while (0 < i) { // Ö»Òª i ÓÐ¸¸Ç×£¨ÉÐÎ´µÖ´ï¶Ñ¶¥£©£¬Ôò
+//        int j = parent(i); // ½« i Ö®¸¸¼Ç×÷ j
+//        if (q->nodes[j]->weight < q->nodes[i]->weight) {
+//            break; // Ò»µ©µ±Ç°¸¸×Ó²»ÔÙÄæÐò£¬ÉÏÂËÐý¼´Íê³É
+//        }
+//        // swap
+//        huffman_node * t = q->nodes[i];
+//        q->nodes[i] = q->nodes[j];
+//        q->nodes[j] = t;
+//        i = j; // ·ñÔò£¬¸¸×Ó½»»»Î»ÖÃ£¬²¢¼ÌÐø¿¼²éÉÏÒ»²ã
+//    } //while
+//    return i; //·µ»ØÉÏÂË×îÖÕµÖ´ïµÄÎ»ÖÃ
+//}
 
-// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄµï¿½ i ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÊµÊ©ï¿½ï¿½ï¿½Ë²ï¿½ï¿½ï¿½ï¿½ï¿½i < sizeï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÕµÖ´ï¿½ï¿½Î»ï¿½ï¿½
-int pq_percolate_up(pq * q, int i) {
-    while (0 < i) { // Ö»Òª i ï¿½Ð¸ï¿½ï¿½×£ï¿½ï¿½ï¿½Î´ï¿½Ö´ï¿½Ñ¶ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-        int j = parent(i); // ï¿½ï¿½ i Ö®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ j
-        if (q->nodes[j]->weight < q->nodes[i]->weight) {
-            break; // Ò»ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ó²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-        }
-        // swap
-        huffman_node * t = q->nodes[i];
-        q->nodes[i] = q->nodes[j];
-        q->nodes[j] = t;
-        i = j; // ï¿½ï¿½ï¿½ò£¬¸ï¿½ï¿½Ó½ï¿½ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
-    } //while
-    return i; //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÕµÖ´ï¿½ï¿½Î»ï¿½ï¿½
-}
+extern int pq_percolate_down(pq * q, int n, int i);
+//// ¶ÔÏòÁ¿Ç° n¸ö ´ÊÌõÖÐµÄµÚ i ¸öÊµÊ©ÏÂÂË£¬i < n
+//int pq_percolate_down(pq * q, int n, int i) {
+//    int j; // i¼°Æä£¨ÖÁ¶àÁ½¸ö£©º¢×ÓÖÐ£¬¿°Îª¸¸Õß
+//    while (i != (j = properparent(q, n, i))) { // Ö»Òªi·Çj£¬Ôò
+//        // swap
+//        huffman_node * t = q->nodes[i];
+//        q->nodes[i] = q->nodes[j];
+//        q->nodes[j] = t;
+//        i = j;
+//    } // ¶þÕß»»Î»£¬²¢¼ÌÐø¿¼²éÏÂ½µºóµÄi
+//    return i; // ·µ»ØÏÂÂËµÖ´ïµÄÎ»ÖÃ£¨ÒàiÒàj£©
+//}
 
-// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç° nï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ÐµÄµï¿½ i ï¿½ï¿½ÊµÊ©ï¿½ï¿½ï¿½Ë£ï¿½i < n
-int pq_percolate_down(pq * q, int n, int i) {
-    int j; // iï¿½ï¿½ï¿½ä£¨ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð£ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½
-    while (i != (j = properparent(q, n, i))) { // Ö»Òªiï¿½ï¿½jï¿½ï¿½ï¿½ï¿½
-        // swap
-        huffman_node * t = q->nodes[i];
-        q->nodes[i] = q->nodes[j];
-        q->nodes[j] = t;
-        i = j;
-    } // ï¿½ï¿½ï¿½ß»ï¿½Î»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â½ï¿½ï¿½ï¿½ï¿½i
-    return i; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ËµÖ´ï¿½ï¿½Î»ï¿½Ã£ï¿½ï¿½ï¿½iï¿½ï¿½jï¿½ï¿½
-}
+extern void pq_heapify(pq * q, int n); // Floyd½¨¶ÑËã·¨£¬O(n)Ê±¼ä
+//void pq_heapify(pq * q, int n) { // Floyd½¨¶ÑËã·¨£¬O(n)Ê±¼ä
+//    for (int i = last_internal(n); in_heap(n, i); i--) { // ×Ôµ×¶øÉÏ£¬ÒÀ´Î
+//        pq_percolate_down(q, n, i); // ÏÂÂË¸÷ÄÚ²¿½Úµã
+//    }
+//}
 
-void pq_heapify(pq * q, int n) { // Floydï¿½ï¿½ï¿½ï¿½ï¿½ã·¨ï¿½ï¿½O(n)Ê±ï¿½ï¿½
-    for (int i = last_internal(n); in_heap(n, i); i--) { // ï¿½Ôµ×¶ï¿½ï¿½Ï£ï¿½ï¿½ï¿½ï¿½ï¿½
-        pq_percolate_down(q, n, i); // ï¿½ï¿½ï¿½Ë¸ï¿½ï¿½Ú²ï¿½ï¿½Úµï¿½
-    }
-}
+extern void pq_insert(pq * q, huffman_node * node); // ½«´ÊÌõ²åÈëÍêÈ«¶þ²æ¶ÑÖÐ
+//void pq_insert(pq * q, huffman_node * node) { // ½«´ÊÌõ²åÈëÍêÈ«¶þ²æ¶ÑÖÐ
+//    // Ê×ÏÈ½«ÐÂ´ÊÌõ½ÓÖÁÏòÁ¿Ä©Î²
+//    q->nodes[q->size] = node;
+//    q->size++;
+//    // ÔÙ¶Ô¸Ã´ÊÌõÊµÊ©ÉÏÂËµ÷Õû
+//    pq_percolate_up(q, q->size - 1);
+//}
 
-void pq_insert(pq * q, huffman_node * node) { // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-    // ï¿½ï¿½ï¿½È½ï¿½ï¿½Â´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä©Î²
-    q->nodes[q->size] = node;
-    q->size++;
-    // ï¿½Ù¶Ô¸Ã´ï¿½ï¿½ï¿½ÊµÊ©ï¿½ï¿½ï¿½Ëµï¿½ï¿½ï¿½
-    pq_percolate_up(q, q->size - 1); 
-}
+extern huffman_node * pq_delmax(pq * q);
+//huffman_node * pq_delmax(pq * q) { // É¾³ý·Ç¿ÕÍêÈ«¶þ²æ¶ÑÖÐÓÅÏÈ¼¶×î¸ßµÄ´ÊÌõ
+//    huffman_node * max = q->nodes[0];
+//    q->nodes[0] = q->nodes[--(q->size)]; // Õª³ý¶Ñ¶¥£¨Ê×´ÊÌõ£©£¬´úÖ®ÒÔÄ©´ÊÌõ
+//    pq_percolate_down(q, q->size, 0); // ¶ÔÐÂ¶Ñ¶¥ÊµÊ©ÏÂÂË
+//    return max; // ·µ»Ø´ËÇ°±¸·ÝµÄ×î´ó´ÊÌõ£¬ÐèÒªÍâ²¿ÊÍ·Å
+//}
 
-huffman_node * pq_delmax(pq * q) { // É¾ï¿½ï¿½ï¿½Ç¿ï¿½ï¿½ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È¼ï¿½ï¿½ï¿½ßµÄ´ï¿½ï¿½ï¿½
-    huffman_node * max = q->nodes[0];
-    q->nodes[0] = q->nodes[--(q->size)]; // Õªï¿½ï¿½ï¿½Ñ¶ï¿½ï¿½ï¿½ï¿½×´ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö®ï¿½ï¿½Ä©ï¿½ï¿½ï¿½ï¿½
-    pq_percolate_down(q, q->size, 0); // ï¿½ï¿½ï¿½Â¶Ñ¶ï¿½ÊµÊ©ï¿½ï¿½ï¿½ï¿½
-    return max; // ï¿½ï¿½ï¿½Ø´ï¿½Ç°ï¿½ï¿½ï¿½Ýµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òªï¿½â²¿ï¿½Í·ï¿½
-}
-
+extern pq * char_statistics(unsigned char * file_name, int * byte_count);
 pq * char_statistics(unsigned char * file_name, int * byte_count) {
     *byte_count = 0;
-    // ï¿½ï¿½Ê¼ï¿½ï¿½ pq
+    // ³õÊ¼»¯ pq
     pq * q = pq_create();
     huffman_node * nodes[256];
     for (int i = 0; i < 256; ++i) {
         nodes[i] = huffman_node_create_external_node(i);
     }
-    // ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½È¡
+    // ´ÓÎÄ¼þÁ÷ÖÐ¶ÁÈ¡
     FILE * file_stream = NULL;
     if ((file_stream = fopen(file_name, "rb")) == NULL) {
         pq_destory(q);
@@ -153,7 +162,7 @@ pq * char_statistics(unsigned char * file_name, int * byte_count) {
         ++(*byte_count);
     }
     fclose(file_stream);
-    // ï¿½ï¿½ï¿½ï¿½
+    // ½¨¶Ñ
     for (int i = 0; i < 256; ++i) {
         pq_insert(q, nodes[i]);
     }
@@ -162,31 +171,33 @@ pq * char_statistics(unsigned char * file_name, int * byte_count) {
 
 typedef huffman_node huffman_forest;
 
-huffman_forest * huffman_forest_create(pq * q) {
-    if (!q || q->size == 0) {
-        return NULL;
-    }
-    while (q->size > 1) {
-        huffman_node * first = pq_delmax(q);
-        huffman_node * second = pq_delmax(q);
-        huffman_node * internal_node = huffman_node_create_internal_node(first, second);
-        pq_insert(q, internal_node);
-    }
-    return pq_delmax(q);
-}
+extern huffman_forest * huffman_forest_create(pq * q);
+//huffman_forest * huffman_forest_create(pq * q) {
+//    if (!q || q->size == 0) {
+//        return NULL;
+//    }
+//    while (q->size > 1) {
+//        huffman_node * first = pq_delmax(q);
+//        huffman_node * second = pq_delmax(q);
+//        huffman_node * internal_node = huffman_node_create_internal_node(first, second);
+//        pq_insert(q, internal_node);
+//    }
+//    return pq_delmax(q);
+//}
 
-void huffman_forest_destory(huffman_forest * forest) {
-    if (!forest) {
-        return;
-    }
-    if (forest->left_child) {
-        huffman_forest_destory(forest->left_child);
-    }
-    if (forest->right_child) {
-        huffman_forest_destory(forest->right_child);
-    }
-    huffman_node_destory(forest);
-}
+void huffman_forest_destory(huffman_forest * forest);
+//void huffman_forest_destory(huffman_forest * forest) {
+//    if (!forest) {
+//        return;
+//    }
+//    if (forest->left_child) {
+//        huffman_forest_destory(forest->left_child);
+//    }
+//    if (forest->right_child) {
+//        huffman_forest_destory(forest->right_child);
+//    }
+//    huffman_node_destory(forest);
+//}
 
 // ------------------------------------------------------------------------------------------
 
@@ -235,7 +246,7 @@ void _mapper_set_all(mapper * mappers, huffman_node * forest, int depth, unsigne
 }
 
 void mapper_set_all(mapper * mappers, huffman_node * forest) {
-    unsigned char bits[256] = { 0, }; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+    unsigned char bits[256] = { 0, }; // ÏÈÐò±éÀú
     _mapper_set_all(mappers, forest, 0, bits);
 }
 
@@ -251,7 +262,7 @@ huffman_buffer * huffman_buffer_create(int max_byte_count) {
     huffman_buffer * buffer = (huffman_buffer *)malloc(sizeof(huffman_buffer));
     buffer->current_bit_size = 0;
     buffer->byte_capacity = max_byte_count;
-    //! ï¿½ï¿½Ê¼ï¿½ï¿½Îª0
+    //! ³õÊ¼»¯Îª0
     buffer->buffer = (unsigned char *)malloc(max_byte_count * sizeof(unsigned char));
     memset(buffer->buffer, 0, max_byte_count);
     return buffer;
@@ -332,9 +343,9 @@ void write_into_file(huffman_buffer * info_buffer, huffman_buffer * data_buffer,
 
 // ------------------------------------------------------------------------------------------
 
-// ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½Ö¸ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½ï¿½Öµ
+// ´«ÈëÖ¸ÕëÖ¸Õë×÷Îª·µ»ØÖµ
 int read_from_file(huffman_buffer ** info_buffer, huffman_buffer ** data_buffer, char * file_name) {
-    // ï¿½ï¿½ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½È¡
+    // ´ÓÎÄ¼þÁ÷ÖÐ¶ÁÈ¡
     FILE * file_stream = NULL;
     if ((file_stream = fopen(file_name, "rb")) == NULL) {
         return 0;
@@ -357,7 +368,7 @@ int read_from_file(huffman_buffer ** info_buffer, huffman_buffer ** data_buffer,
 }
 
 pq * rebuild_pq(huffman_buffer * info_buffer) {
-    // ï¿½ï¿½Ê¼ï¿½ï¿½ pq
+    // ³õÊ¼»¯ pq
     pq * q = pq_create();
     huffman_node * nodes[256];
     char * data_offset = info_buffer->buffer + 2 * sizeof(int) + 16;
@@ -365,7 +376,7 @@ pq * rebuild_pq(huffman_buffer * info_buffer) {
         nodes[i] = huffman_node_create_external_node(i);
         nodes[i]->weight = ((int *)data_offset)[i];
     }
-    // ï¿½ï¿½ï¿½ï¿½
+    // ½¨¶Ñ
     for (int i = 0; i < 256; ++i) {
         pq_insert(q, nodes[i]);
     }
@@ -380,7 +391,7 @@ unsigned char huffman_buffer_get_next_bit(huffman_buffer * data_buffer) {
 }
 
 unsigned char huffman_buffer_get_next_byte(huffman_buffer * data_buffer, huffman_node * forest) {
-    // ×¢ï¿½â£¬ï¿½Ë¿ï¿½huffmanï¿½ï¿½ï¿½ï¿½ï¿½Ç¹ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½0ï¿½ï¿½1ï¿½ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ó£ï¿½ï¿½ï¿½ï¿½Úµï¿½ï¿½Òºï¿½ï¿½Ó»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Òºï¿½ï¿½Ó£ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½
+    // ×¢Òâ£¬´Ë¿ÃhuffmanÊ÷²»ÊÇ¹æÕûµÄ×ó0ÓÒ1£¬¸ù½ÚµãÊÇÕý³£µÄ×óº¢×Ó£¬¸ù½ÚµãÓÒº¢×Ó»¹ÊÇÕý³£µÄÓÒº¢×Ó£¬ÆäÓàÒ»ÖÂ
     huffman_node * current = huffman_buffer_get_next_bit(data_buffer) ? forest->right_child : forest;
     while (current->left_child || current->right_child) {
         unsigned char bit = huffman_buffer_get_next_bit(data_buffer);
@@ -408,7 +419,7 @@ char * md5(char * password) {
     int len = strlen(password);
     char * md5_code = (char *)malloc(16);
     calc_md5(len, password, md5_code);
-    return md5_code; // ï¿½ï¿½Òªï¿½â²¿ï¿½Í·ï¿½
+    return md5_code; // ÐèÒªÍâ²¿ÊÍ·Å
 }
 
 int password_is_valid(char * input_password, huffman_buffer * info_buffer) {
@@ -438,7 +449,7 @@ void compress(char * file_name, char * password) {
     mapper * mappers = mapper_init();
     mapper_set_all(mappers, forest);
 
-    huffman_buffer * data_buffer = huffman_buffer_create(decompressed_size * 2); // ï¿½ï¿½ï¿½ï¿½Öµ emmmmm
+    huffman_buffer * data_buffer = huffman_buffer_create(decompressed_size * 2); // ¾­ÑéÖµ emmmmm
     compress_into_buffer(file_name, data_buffer, mappers);
     int compressed_size = get_compressed_size(data_buffer);
     huffman_buffer * info_buffer = huffman_buffer_create(DECODE_INFO_BUFFER_SIZE);
@@ -506,6 +517,7 @@ void usage() {
 // ------------------------------------------------------------------------------------------
 
 int main(int argc, char * argv[]) {
+    // compress("É½ºÓÈëÃÎ.txt", "hahah");
     if (argc == 3) {
         if (strcmp(argv[1], "compress") == 0) {
             compress(argv[2], NULL);
