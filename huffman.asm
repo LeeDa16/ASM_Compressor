@@ -307,7 +307,7 @@ pq_heapify endp
 
 
 ; return nothing
-pq_insert proc, q: ptr priority_queue, node: ptr huffman_node
+pq_insert proc uses ebx ecx edx, q: ptr priority_queue, node: ptr huffman_node
 	; 首先将新词条接至向量末尾
 	mov ebx, q
 	mov ecx, [ebx]
@@ -346,14 +346,13 @@ pq_delmax proc uses ebx ecx edx, q: ptr priority_queue
 	ret
 pq_delmax endp 
 
-comment ~
 
 .data
-rb_flag byte "rb+", 0
+rb_flag byte "rb", 0
 .code
 ; return ptr priority_queue
 char_statistics proc, file_name: ptr byte, byte_count: ptr dword
-	local q: ptr priority_queue, nodes: dword, file_stream: dword, char: dword
+	local q: ptr priority_queue, nodes: ptr ptr huffman_node, file_stream: dword, char: dword
 	invoke crt_malloc, 1024
 	mov nodes, eax
 
@@ -368,14 +367,14 @@ char_statistics proc, file_name: ptr byte, byte_count: ptr dword
 	mov ebx, 0
 create_external_node:
 	invoke huffman_node_create_external_node, ebx
-	mov edx, nodes
-	mov [edx + ebx * 4], eax
+	mov edx, [nodes + 0]
+	mov [edx + ebx * 4 + 0], eax
 	inc ebx
 	loop create_external_node
 
 	; 从文件流中读取
 	mov file_stream, 0
-	mov eax, fopen(file_name)
+	invoke crt_fopen, file_name, offset rb_flag
 	mov file_stream, eax
 	cmp eax, 0
 	je release
@@ -387,10 +386,11 @@ read_byte:
 	.if eax == 0ffffffffh
 		jmp build_pq
 	.endif
-	mov edx, nodes
-	mov ecx, [edx + eax * 4 + 1]
+	mov edx, [nodes + 0]
+	mov esi, [edx + eax * 4]
+	mov ecx, [esi + 1]
 	inc ecx
-	mov [edx + eax * 4 + 1], ecx
+	mov [esi + 1], ecx
 
 	mov edx, byte_count
 	mov ecx, [edx]
@@ -417,7 +417,6 @@ release:
 	ret
 char_statistics endp 
 
-~
 
 ; return ptr huffman_node
 huffman_forest_create proc uses ebx ecx, q: ptr priority_queue

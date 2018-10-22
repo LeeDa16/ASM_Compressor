@@ -50,7 +50,7 @@ pq_insert proto, q: ptr priority_queue, node: ptr huffman_node
 pq_delmax proto, q: ptr priority_queue
 
 ; return ptr priority_queue
-; char_statistics proto, file_name: ptr byte, byte_count: ptr dword
+char_statistics proto, file_name: ptr byte, byte_count: ptr dword
 
 ; return ptr huffman_node
 huffman_forest_create proto, q: ptr priority_queue
