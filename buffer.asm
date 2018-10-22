@@ -2,7 +2,7 @@
 huffman_buffer STRUCT
 	current_byte_size 	SDWORD 0
 	byte_capacity 		SDWORD 0
-	buffer 				PTR END 1 dup(?)
+	buffer 				PTR BYTE 1 dup(?)
 huffman_buffer ENDS
 
 	mode_rb	BYTE "rb", 0
