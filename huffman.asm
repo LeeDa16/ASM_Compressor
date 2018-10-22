@@ -351,7 +351,7 @@ pq_delmax endp
 rb_flag byte "rb", 0
 .code
 ; return ptr priority_queue
-char_statistics proc, file_name: ptr byte, byte_count: ptr dword
+char_statistics proc uses ebx ecx edx esi, file_name: ptr byte, byte_count: ptr dword
 	local q: ptr priority_queue, nodes: ptr ptr huffman_node, file_stream: dword, char: dword
 	invoke crt_malloc, 1024
 	mov nodes, eax

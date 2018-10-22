@@ -138,36 +138,36 @@ extern huffman_node * pq_delmax(pq * q);
 //    return max; // 返回此前备份的最大词条，需要外部释放
 //}
 
-extern pq * char_statistics(unsigned char * file_name, int * byte_count);
-pq * char_statistics(unsigned char * file_name, int * byte_count) {
-    *byte_count = 0;
-    // 初始化 pq
-    pq * q = pq_create();
-    huffman_node * nodes[256];
-    for (int i = 0; i < 256; ++i) {
-        nodes[i] = huffman_node_create_external_node(i);
-    }
-    // 从文件流中读取
-    FILE * file_stream = NULL;
-    if ((file_stream = fopen(file_name, "rb")) == NULL) {
-        pq_destory(q);
-        for (int i = 0; i < 256; ++i) {
-            huffman_node_destory(nodes[i]);
-        }
-        return NULL;
-    }
-    int c = 0;
-    while ((c = fgetc(file_stream)) != EOF) {
-        nodes[(unsigned char)c]->weight++;
-        ++(*byte_count);
-    }
-    fclose(file_stream);
-    // 建堆
-    for (int i = 0; i < 256; ++i) {
-        pq_insert(q, nodes[i]);
-    }
-    return q;
-}
+//extern pq * char_statistics(unsigned char * file_name, int * byte_count);
+//pq * char_statistics(unsigned char * file_name, int * byte_count) {
+//    *byte_count = 0;
+//    // 初始化 pq
+//    pq * q = pq_create();
+//    huffman_node * nodes[256];
+//    for (int i = 0; i < 256; ++i) {
+//        nodes[i] = huffman_node_create_external_node(i);
+//    }
+//    // 从文件流中读取
+//    FILE * file_stream = NULL;
+//    if ((file_stream = fopen(file_name, "rb")) == NULL) {
+//        pq_destory(q);
+//        for (int i = 0; i < 256; ++i) {
+//            huffman_node_destory(nodes[i]);
+//        }
+//        return NULL;
+//    }
+//    int c = 0;
+//    while ((c = fgetc(file_stream)) != EOF) {
+//        nodes[(unsigned char)c]->weight++;
+//        ++(*byte_count);
+//    }
+//    fclose(file_stream);
+//    // 建堆
+//    for (int i = 0; i < 256; ++i) {
+//        pq_insert(q, nodes[i]);
+//    }
+//    return q;
+//}
 
 typedef huffman_node huffman_forest;
 
@@ -517,7 +517,7 @@ void usage() {
 // ------------------------------------------------------------------------------------------
 
 int main(int argc, char * argv[]) {
-    // compress("山河入梦.txt", "hahah");
+    compress("山河入梦.txt", "hahah");
     if (argc == 3) {
         if (strcmp(argv[1], "compress") == 0) {
             compress(argv[2], NULL);
