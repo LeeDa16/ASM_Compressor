@@ -83,7 +83,7 @@ lc:
 	; if (forest->left_child)
 	mov eax, forest
 	cmp dword ptr [eax + 5], 0
-	jerc
+	je rc
 	; bits[depth + 1] = 0;
 	mov eax, bits
 	add eax, depth
@@ -106,7 +106,7 @@ rc:
 	; if (forest->right_child)
 	mov eax, forest
 	cmp dword ptr [eax + 9], 0
-	jereturn
+	je return
 	; bits[depth + 1] = 1
 	mov eax, bits
 	add eax, depth

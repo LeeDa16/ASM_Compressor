@@ -28,7 +28,6 @@ info_decompressed_into byte "[ INFO ]: File [ %s ] was decompressed into [ %s ] 
 
 .code
 
-
 append_tql proc uses eax ebx, origin_file_name: ptr byte
 	local temp_ptr: ptr byte
 	invoke crt_strlen, addr origin_file_name
