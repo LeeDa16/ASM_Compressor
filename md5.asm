@@ -1,13 +1,13 @@
 include md5.inc
-include Irvine32.inc
+include msvcrt.inc
 
 calc_md5 proto, block_size: sdword, datablock: ptr byte, dest_hash: ptr byte
 
-md5 proto, password: ptr byte
-
-password_is_valid proto, input_password: ptr byte, info_buffer: ptr huffman_buffer
-	local md5_stored: ptr byte, md5_input: ptr byte
-
+huffman_buffer STRUCT
+	current_byte_size 	SDWORD 0
+	byte_capacity 		SDWORD 0
+	buffer 				dword ?
+huffman_buffer ENDS
 
 .code 
 calc_md5 proc, block_size: sdword, datablock: ptr byte, dest_hash: ptr byte
@@ -22,17 +22,18 @@ calc_md5 endp
 
 ;----------------------------
 ;------------WSY-------------
+;
 
 md5 proc, password: ptr byte
 	local len: sdword
-	invoke Str_length, password
+	invoke crt_strlen, password
 	mov len, eax
 	invoke crt_malloc, 16
 	invoke calc_md5, len, password, eax
 	ret
-ma5 endp
+md5 endp
 
-password_is_valid proc uses ecx, input_password: ptr byte, info_buffer: ptr huffman_buffer
+password_is_valid proc uses ecx edx ebx, input_password: ptr byte, info_buffer: ptr huffman_buffer
 	local md5_stored: ptr byte, md5_input: ptr byte
 	;mov eax, 0
 	;是否需要对eax的置零操作？
@@ -41,7 +42,10 @@ password_is_valid proc uses ecx, input_password: ptr byte, info_buffer: ptr huff
 	invoke md5, input_password
 	mov md5_input, eax
 	mov ecx, 16
-L1: .if md5_stored[ecx - 1] != md5_input[ecx - 1]
+L1: mov edx, ecx
+	dec edx
+	mov ebx, md5_stored[edx]
+	.if ebx != md5_input[edx]
 		mov eax, 0
 		ret
 	.endif

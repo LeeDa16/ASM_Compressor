@@ -1,12 +1,8 @@
-include pq.inc
-include mapper.inc
 include md5.inc
+include msvcrt.inc
+include mapper.inc
+include huffman.inc
 
-
-print_msg macro msg
-	mov edx, offset msg
-	call WriteString
-print_msg endm
 
 usage proto
 
@@ -22,40 +18,47 @@ usage_msg byte				"Usage:", nl,
 							"  compress filename",nl,
 							"  decompress filename", nl,
 							"  compress filename [ -p password ]", nl,
-							"  decompress filename [ -p password ]", nl
-failed_no_such_file byte	"[ FAILED ]: No such file named [ %s ] ...", nl
-info_compressing byte		"[ INFO ]: Compressing ...", nl
-info_compressed_into byte	"[ INFO ]: File [ %s ] was compressed into [ %s ] successfully...", nl
-failed_no_permission byte	"[ FAILED ]: You have NO permission to decompress the file.", nl
-info_decompressing byte		"[ INFO ]: Decompressing ...", nl
-info_decompressed_into byte "[ INFO ]: File [ %s ] was decompressed into [ %s ] successfully...", nl
+							"  decompress filename [ -p password ]", nl, 0
+failed_no_such_file byte	"[ FAILED ]: No such file named [ %s ] ...", nl, 0
+info_compressing byte		"[ INFO ]: Compressing ...", nl, 0
+info_compressed_into byte	"[ INFO ]: File [ %s ] was compressed into [ %s ] successfully...", nl, 0
+failed_no_permission byte	"[ FAILED ]: You have NO permission to decompress the file.", nl, 0
+info_decompressing byte		"[ INFO ]: Decompressing ...", nl, 0
+info_decompressed_into byte "[ INFO ]: File [ %s ] was decompressed into [ %s ] successfully...", nl, 0
 
 .code
 
 
 append_tql proc uses eax ebx, origin_file_name: ptr byte
 	local temp_ptr: ptr byte
-	invoke Str_length, origin_file_name
+	invoke crt_strlen, addr origin_file_name
 	mov ebx, eax
-	invoke crt_malloc, ebx + 5
-	invoke Str_copy, origin_file_name, eax
+	add ebx, 5
+	invoke crt_malloc, ebx
+	invoke crt_strcpy, origin_file_name, eax
 	mov ebx, origin_file_name
 	mov temp_ptr, ebx
 	mov origin_file_name, eax
 	invoke crt_free, temp_ptr
-	mov [eax + ebx], "."
-	mov [eax + ebx + 1], "t"
-	mov [eax + ebx + 2], "q"
-	mov [eax + ebx + 3], "l"
-	mov [eax + ebx + 4], 0
+	add eax, ebx
+	mov ebx, "."
+	mov [eax], ebx
+	mov ebx, "t"
+	mov [eax + 1], ebx
+	mov ebx, "q"
+	mov [eax + 2], ebx
+	mov ebx, "l"
+	mov [eax + 3], ebx
+	mov ebx, 0
+	mov [eax + 4], ebx
 
 	ret
 append_tql endp
 
 compress proc uses eax ebx edx, file_name: ptr byte, password: ptr byte
 	local md5_code: ptr byte, decompressed_size: sdword,
-		q: ptr pq, forest: ptr huffman_forest,
-		mappers: ptr mapper, data_buffer: ptr huffman_buffer,
+		q: ptr pq, forest: ptr huffman_forest, mappers: ptr mapper,
+		data_buffer: ptr huffman_buffer, compressed_size: sdword,
 		info_buffer: ptr huffman_buffer, compressed_file_name: ptr byte
 
 	invoke md5, password
@@ -64,10 +67,10 @@ compress proc uses eax ebx edx, file_name: ptr byte, password: ptr byte
 	invoke char_statistics, file_name, addr decompressed_size
 	mov q, eax
 	.if q != 0
-		print_msg failed_no_such_file
+		invoke crt_printf, addr failed_no_such_file
 		ret
 	.endif
-	print_msg info_compressing
+	invoke crt_printf, addr info_compressing
 	invoke huffman_forest_create, q
 	mov forest, eax
 	invoke mapper_init
@@ -84,16 +87,17 @@ compress proc uses eax ebx edx, file_name: ptr byte, password: ptr byte
 	invoke save_encode_info_into_buffer, info_buffer, decompressed_size, 
 		compressed_size, md5_code, mappers
 
-	invoke Str_length, file_name
+	invoke crt_strlen, file_name
 	mov ebx, eax
-	invoke crt_malloc, ebx + 4 + 1
+	add ebx, 5
+	invoke crt_malloc, ebx
 	mov compressed_file_name, eax
-	invoke Str_copy, compressed_file_name, file_name
+	invoke crt_strcpy, compressed_file_name, file_name
 	invoke append_tql, compressed_file_name
 	invoke write_into_file, info_buffer, data_buffer, compressed_file_name
-	print_msg info_compressed_into
+	invoke crt_printf, addr info_compressed_into
 
-	invoke crt_free, mdt_code
+	invoke crt_free, md5_code
 	invoke pq_destroy, q
 	invoke huffman_forest_destroy, forest
 	invoke mapper_destroy, mappers
@@ -113,17 +117,17 @@ decompress proc, file_name: ptr byte, password: ptr byte
 	mov info_buffer, 0
 	invoke read_from_file, addr info_buffer, addr data_buffer, file_name
 	.if eax == 0
-		print_msg failed_no_such_file
+		invoke crt_printf, addr failed_no_such_file
 		ret
 	.endif
 	invoke password_is_valid, password, info_buffer
 	.if eax == 0
-		print_msg failed_no_permission
+		invoke crt_printf, addr failed_no_permission
 		invoke huffman_buffer_destroy, data_buffer
 		invoke huffman_buffer_destroy, info_buffer
 		ret
 	.else
-		print_msg info_decompressing
+		invoke crt_printf, addr info_decompressing
 	.endif
 
 	invoke rebuild_pq, info_buffer
@@ -136,15 +140,17 @@ decompress proc, file_name: ptr byte, password: ptr byte
 	mov mappers, eax
 	invoke mapper_set_all, mappers, forest
 
-	invoke Str_length, file_name
+	invoke crt_strlen, addr file_name
 	mov ebx, eax
-	invoke crt_malloc, ebx + 1
+	inc ebx
+	invoke crt_malloc, ebx
 	mov decompressed_file_name, eax
-	invoke Str_copy, decompressed_file_name, file_name
-	mov decompressed_file_name[ebx - 4], 0
+	invoke crt_strcpy, decompressed_file_name, file_name
+	sub ebx, 4
+	mov decompressed_file_name[ebx], 0
 	
 	invoke write_into_file, 0, decompressed_buffer, decompressed_file_name
-	print_msg info_decompressed_into
+	invoke crt_printf, addr info_decompressed_into
 
 	invoke pq_destroy, q
 	invoke huffman_forest_destroy, forest
@@ -154,5 +160,11 @@ decompress proc, file_name: ptr byte, password: ptr byte
 
 	ret
 decompress endp
+
+usage proc
+	invoke crt_printf, addr usage_msg
+
+	ret
+usage endp
 
 end

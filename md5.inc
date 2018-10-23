@@ -117,6 +117,10 @@ II macro a,b,c,d,k,s,i
 	add	a,b
 endm II
 
+md5 proto, password: ptr byte
+
+password_is_valid proto, input_password: ptr byte, info_buffer: ptr huffman_buffer
+
 .code
 _rwf_md5 proc
 	pushad
