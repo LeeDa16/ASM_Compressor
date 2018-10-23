@@ -47,39 +47,37 @@ huffman_buffer_destroy PROC USES esi, buffer: PTR huffman_buffer
 huffman_buffer_destroy ENDP
 
 huffman_buffer_insert PROC USES ebx ecx esi, buffer: PTR huffman_buffer, bit_count: SDWORD, bits: PTR BYTE
-	LOCAL i: SDWORD
-	mov i, 0
-forloop:
-	mov esi, buffer
-	mov eax, i
-	mov ebx, bit_count
-	.IF eax >= ebx
-		jmp quit
-	.ENDIF
-	mov ebx, bits
-	add ebx, i
-	.IF BYTE PTR [ebx] == 1
+
+	mov ecx, bit_count
+L1:
+	mov esi, bits
+	mov eax, bit_count
+	sub eax, ecx
+	
+	mov bl, BYTE PTR [esi + eax]
+	.IF bl == 1
+		mov esi, buffer
 		mov eax, (huffman_buffer PTR [esi]).current_byte_size
+		push ecx
+		mov ecx, eax
+		
 		sar eax, 3
 
-		mov ecx, (huffman_buffer PTR [esi]).current_byte_size
 		and ecx, 00000007h
-.IF		ecx != 0
-		mov ebx, 1
-L1:
-		sal ebx, 1
-		loop L1
-.ENDIF
-		; or BYTE PTR (huffman_buffer PTR [esi]).buffer[eax], bl
-		; mov esi, buffer
+		.IF ecx != 0
+			mov ebx, 1
+L2:	
+			sal ebx, 1
+			loop L2
+		.ENDIF
+
 		mov esi, (huffman_buffer PTR [esi]).buffer
 		or BYTE PTR [esi + eax], bl
+		pop ecx
 	.ENDIF
+	mov esi, buffer
 	inc (huffman_buffer PTR [esi]).current_byte_size
-
-	inc i
-	jmp forloop
-quit:
+	loop L1
 	ret
 huffman_buffer_insert ENDP
 
@@ -261,13 +259,13 @@ L1:
 		.ENDIF
 		mov ecx, count
 L2:
-		mov count, eax
+		mov eax, count
 		sub eax, ecx
 		mov esi, data_buffer
 		mov esi, (huffman_buffer PTR [esi]).buffer
 		add esi, eax
 		pushad
-		INVOKE crt_fputc, esi, file_stream
+		INVOKE crt_fputc, BYTE PTR [esi], file_stream
 		popad
 
 		loop L2
@@ -280,176 +278,186 @@ quit:
 	ret
 write_into_file ENDP
 
-; read_from_file PROC USES ecx esi, info_buffer: PTR PTR huffman_buffer, data_buffer: PTR PTR huffman_buffer, file_name: PTR BYTE
-; 	LOCAL file_stream: DWORD
-; 	LOCAL tmpc: BYTE
-; 	LOCAL m_size: SDWORD
+read_from_file PROC USES ecx esi, info_buffer: PTR PTR huffman_buffer, data_buffer: PTR PTR huffman_buffer, file_name: PTR BYTE
+	LOCAL file_stream: DWORD
+	LOCAL tmpc: BYTE
+	LOCAL m_size: SDWORD
 
-; 	mov file_stream, 0
-; 	pushad
-; 	INVOKE crt_fopen, file_name
-; 	mov file_stream, eax
-; 	popad
-; 	.IF file_stream == 0
-; 		ret
-; 	.ENDIF
+	mov file_stream, 0
+	pushad
+	INVOKE crt_fopen, file_name, OFFSET rb_mode
+	mov file_stream, eax
+	popad
+	.IF file_stream == 0
+		mov eax, 0
+		ret
+	.ENDIF
 
-; 	.IF info_buffer != 0
-; 		INVOKE huffman_buffer_create, DECODE_INFO_BUFFER_SIZE
-; 		mov [info_buffer], eax
+	.IF info_buffer != 0
+		INVOKE huffman_buffer_create, DECODE_INFO_BUFFER_SIZE
+		mov esi, info_buffer
+		mov DWORD PTR [esi], eax
 
-; 		mov ecx, DECODE_INFO_BUFFER_SIZE
-; L1:
-; 		mov eax, DECODE_INFO_BUFFER_SIZE
-; 		sub eax, ecx
+		mov ecx, DECODE_INFO_BUFFER_SIZE
+L1:
+		mov eax, DECODE_INFO_BUFFER_SIZE
+		sub eax, ecx
 
-; 		mov esi, [info_buffer]
-; 		mov esi, (huffman_buffer PTR [esi]).buffer
-; 		add esi, eax
+		mov esi, info_buffer
+		mov esi, DWORD PTR [esi]
+		mov esi, (huffman_buffer PTR [esi]).buffer
+		add esi, eax
 
-; 		pushad
-; 		INVOKE crt_fgetc, file_stream
-; 		mov tmpc, al
-; 		popad
-; 		mov al, tmpc
-; 		mov BYTE PTR [esi], al
-; 		loop L1
-; 	.ENDIF
+		pushad
+		INVOKE crt_fgetc, file_stream
+		mov tmpc, al
+		popad
+		mov al, tmpc
+		mov BYTE PTR [esi], al
+		loop L1
+	.ENDIF
 
-; 	.IF data_buffer != 0
-; 		mov esi, [info_buffer]
-; 		mov esi, (huffman_buffer PTR [esi]).buffer
-; 		add esi, 4
-; 		mov esi, SDWORD PTR [esi]
-; 		mov m_size, esi
+	.IF data_buffer != 0
+		mov esi, info_buffer
+		mov esi, DWORD PTR [esi]
+		mov esi, (huffman_buffer PTR [esi]).buffer
+		add esi, 4
+		mov esi, SDWORD PTR [esi]
+		mov m_size, esi
 
-; 		INVOKE huffman_buffer_create, m_size
-; 		mov [data_buffer], eax
+		INVOKE huffman_buffer_create, m_size
+		mov esi, data_buffer
+		mov DWORD PTR [esi], eax
 
-; 		mov ecx, m_size
-; L2:
-; 		mov eax, m_size
-; 		sub eax, ecx
+		mov ecx, m_size
+L2:
+		mov eax, m_size
+		sub eax, ecx
 
-; 		mov esi, [data_buffer]
-; 		mov esi, (huffman_buffer PTR [esi]).buffer
-; 		add esi, eax
+		mov esi, data_buffer
+		mov esi, DWORD PTR [esi]
+		mov esi, (huffman_buffer PTR [esi]).buffer
+		add esi, eax
 
-; 		pushad
-; 		INVOKE crt_fgetc, file_stream
-; 		mov tmpc, al
-; 		popad
-; 		mov al, tmpc
-; 		mov	BYTE PTR [esi], al
-; 		loop L2
-; 	.ENDIF
+		pushad
+		INVOKE crt_fgetc, file_stream
+		mov tmpc, al
+		popad
+		mov al, tmpc
+		mov	BYTE PTR [esi], al
+		loop L2
+	.ENDIF
 
-; 	INVOKE crt_fclose, file_stream
-; 	mov eax, 1
-; 	ret
-; read_from_file ENDP
+	INVOKE crt_fclose, file_stream
+	mov eax, 1
+	ret
+read_from_file ENDP
 
-; huffman_buffer_get_next_bit PROC USES ebx ecx, data_buffer: PTR huffman_buffer
-; 	LOCAL return: BYTE
-; 	mov eax, (huffman_buffer PTR data_buffer).buffer
-; 	mov ebx, (huffman_buffer PTR data_buffer).current_byte_size
-; 	mov ecx, ebx
-; 	sar ebx, 3
-; 	add eax, ebx
-; 	mov eax, [eax]
-; 	.IF eax == 0
-; 		mov eax, 1
-; 	.ELSE
-; 		mov eax, 0
-; 	.ENDIF
+huffman_buffer_get_next_bit PROC USES ebx ecx esi, data_buffer: PTR huffman_buffer
+	mov esi, data_buffer
+	mov eax, (huffman_buffer PTR [esi]).buffer
+	mov ebx, (huffman_buffer PTR [esi]).current_byte_size
+	mov ecx, ebx
+	sar ebx, 3
+	add eax, ebx
+	mov bl, BYTE PTR [eax]
 
-; 	.IF eax == 0
-; 		mov eax, 1
-; 	.ELSE
-; 		mov eax, 0
-; 	.ENDIF
-; 	mov return, al
+	and ecx, 00000007h
+	mov eax, 1
+	.IF ecx != 0
+L1:
+		sal eax, 1
+		loop L1
+	.ENDIF
 
-; 	add ecx, 00000007h
-; 	mov eax, 1
-; L1:
-; 	sal eax, 1
-; 	loop L1
+	and al, bl
+	.IF al != 0
+		mov al, 1
+	.ENDIF
+	and eax, 000000FFh
+	inc (huffman_buffer PTR [esi]).current_byte_size
+	ret
+huffman_buffer_get_next_bit ENDP
+
+huffman_buffer_get_next_byte PROC, data_buffer: PTR huffman_buffer, forest: PTR huffman_node
+	LOCAL current: DWORD
+	LOCAL bit: BYTE
+	INVOKE huffman_buffer_get_next_bit, data_buffer
+	.IF eax != 0
+		mov eax, forest
+		mov eax, (huffman_node PTR [forest]).right_child
+		mov current, eax
+	.ELSE
+		mov eax, forest
+		mov current, eax
+	.ENDIF
 	
-; 	and al, return
-; 	movzx eax, al
+L1:
+	mov eax, current
+	mov eax, (huffman_node PTR [eax]).left_child
+	.IF eax == 0
+		mov eax, current
+		mov eax, (huffman_node PTR [eax]).right_child
+		.IF eax == 0
+			jmp quit
+		.ENDIF
+	.ENDIF
 
-; 	inc (huffman_buffer PTR data_buffer).current_byte_size
-; 	ret
+	INVOKE huffman_buffer_get_next_bit, data_buffer
+	mov bit, al
+	.IF bit == 0
+		mov eax, current
+		mov eax, (huffman_node PTR [eax]).left_child
+		mov current, eax
+	.ELSE
+		mov eax, current
+		mov eax, (huffman_node PTR [eax]).right_child
+		mov current, eax
+	.ENDIF
+	jmp L1
+quit:
+	mov eax, current
+	mov al, (huffman_node PTR [eax]).key
+	and eax, 000000FFh
+	ret	
+huffman_buffer_get_next_byte ENDP
 
-; huffman_buffer_get_next_bit ENDP
+decompress_into_buffer PROC USES ebx ecx esi, info_buffer: PTR huffman_buffer, data_buffer: PTR huffman_buffer, forest: PTR huffman_node
+	LOCAL decompressed_size: SDWORD
+	LOCAL decompressed_buffer: DWORD
+	LOCAL char: BYTE
 
-; huffman_buffer_get_next_byte PROC, data_buffer: PTR huffman_buffer, forest: PTR huffman_node
-; 	LOCAL current: DWORD
-; 	LOCAL bit: BYTE
-; 	INVOKE huffman_buffer_get_next_bit, data_buffer
-; 	.IF eax != 0
-; 		mov eax, (huffman_node PTR [forest]).right_child
-; 		mov current, eax
-; 	.ELSE
-; 		mov eax, forest
-; 		mov current, eax
-; 	.ENDIF
+	mov eax, info_buffer
+	mov eax, (huffman_buffer PTR [eax]).buffer
+	mov eax, SDWORD PTR [eax]
+	mov decompressed_size, eax
+
+	INVOKE huffman_buffer_create, decompressed_size
+	mov decompressed_buffer, eax
+
+	mov ecx, decompressed_size
+L1:
+	mov ebx, decompressed_size
+	sub ebx, ecx
 	
-; L1:
-; 	mov eax, (huffman_node PTR current).left_child
-; 	.IF eax == 0
-; 		mov eax, (huffman_node PTR current).right_child
-; 		.IF eax == 0
-; 			jmp quit
-; 		.ENDIF
-; 	.ENDIF
+	push ebx
+	INVOKE huffman_buffer_get_next_byte, data_buffer, forest
+	pop ebx
+	mov char, al
 
-; 	INVOKE huffman_buffer_get_next_bit, data_buffer
-; 	mov bit, al
-; 	.IF bit == 0
-; 		mov eax, (huffman_node PTR current).left_child
-; 		mov current, eax
-; 	.ELSE
-; 		mov eax, (huffman_node PTR current).right_child
-; 		mov current, eax
-; 	.ENDIF
-; 	jmp L1
-; quit:
-; 	xor eax, eax
-; 	mov al, (huffman_node PTR current).key
-; 	ret	
-; huffman_buffer_get_next_byte ENDP
+	mov esi, decompressed_buffer
+	mov esi, (huffman_buffer PTR [esi]).buffer
+	; add esi, ebx
+	mov BYTE PTR [esi + ebx], al
 
-; decompress_into_buffer PROC USES ebx ecx esi, info_buffer: PTR huffman_buffer, data_buffer: PTR huffman_buffer, forest: PTR huffman_node
-; 	LOCAL decompressed_size: SDWORD
-; 	LOCAL decompressed_buffer: DWORD
-; 	LOCAL char: BYTE
+	inc ebx
+	sal ebx, 3
 
-; 	mov eax, (huffman_buffer PTR info_buffer).buffer
-; 	mov decompressed_size, SDWORD PTR eax
+	mov esi, decompressed_buffer
+	mov (huffman_buffer PTR [esi]).current_byte_size, ebx
+	loop L1
 
-; 	INVOKE huffman_buffer_create, decompressed_size
-; 	mov decompressed_buffer, eax
-
-; 	mov ecx, decompressed_size
-; L1:
-; 	mov ebx, decompressed_size
-; 	sub ebx, ecx
-	
-; 	INVOKE huffman_buffer_get_next_byte, data_buffer, forest
-; 	mov char, al
-
-; 	mov esi, (huffman_buffer PTR decompressed_buffer).buffer
-; 	add esi, ebx
-; 	mov BYTE PTR [esi], al
-
-; 	inc ebx
-; 	sal ebx, 3
-
-; 	mov (huffman_buffer PTR decompressed_buffer).current_byte_size, ebx
-; 	loop L1
-
-; 	mov eax, decompressed_buffer
-; decompress_into_buffer ENDP
+	mov eax, decompressed_buffer
+	ret
+decompress_into_buffer ENDP
 END
