@@ -401,6 +401,8 @@ L2:
 	pop ecx
 	loop L2
 
+	INVOKE crt_free, nodes
+
 	mov eax, q
 	ret
 rebuild_pq ENDP
