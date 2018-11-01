@@ -353,6 +353,58 @@ L2:
 	ret
 read_from_file ENDP
 
+rebuild_pq PROC USES ebx ecx esi, info_buffer: PTR huffman_buffer
+	LOCAL q: DWORD
+	LOCAL nodes: DWORD
+	LOCAL data_offset: DWORD
+	LOCAL i: DWORD
+
+	INVOKE crt_malloc, 256 * 4
+	mov nodes, eax
+	INVOKE pq_create
+	mov q, eax
+	mov esi, info_buffer
+	mov eax, (huffman_buffer PTR [esi]).buffer
+	add eax, 24
+	mov data_offset, eax
+	mov ecx, 256
+L1:
+	mov ebx, 256
+	sub ebx, ecx
+	mov i, ebx
+
+	push ecx
+	INVOKE huffman_node_create_external_node, ebx
+	pop ecx
+
+	imul ebx, 4
+	add ebx, nodes
+	
+	mov (DWORD PTR [ebx]), eax
+	mov esi, eax
+	mov eax, i
+	imul eax, 4
+	add eax, data_offset
+	mov eax, DWORD PTR [eax]
+	mov (huffman_node PTR [esi]).weight, eax
+	loop L1
+
+	mov ecx, 256
+L2:
+	mov eax, 256
+	sub eax, ecx
+	push ecx
+	imul eax, 4
+	add eax, nodes
+	mov eax, (DWORD PTR [eax])
+	INVOKE pq_insert, q, eax
+	pop ecx
+	loop L2
+
+	mov eax, q
+	ret
+rebuild_pq ENDP
+
 huffman_buffer_get_next_bit PROC USES ebx ecx esi, data_buffer: PTR huffman_buffer
 	mov esi, data_buffer
 	mov eax, (huffman_buffer PTR [esi]).buffer
