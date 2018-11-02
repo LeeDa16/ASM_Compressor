@@ -2,7 +2,7 @@ include md5.inc
 include msvcrt.inc
 include mapper.inc
 include huffman.inc
-
+include huffman_buffer.inc
 
 usage proto
 
@@ -65,8 +65,8 @@ compress proc uses eax ebx edx, file_name: ptr byte, password: ptr byte
 	mov decompressed_size, 0
 	invoke char_statistics, file_name, addr decompressed_size
 	mov q, eax
-	.if q != 0
-		invoke crt_printf, addr failed_no_such_file
+	.if q == 0
+		invoke crt_printf, addr failed_no_such_file, addr file_name
 		ret
 	.endif
 	invoke crt_printf, addr info_compressing
@@ -76,7 +76,9 @@ compress proc uses eax ebx edx, file_name: ptr byte, password: ptr byte
 	mov mappers, eax
 	invoke mapper_set_all, mappers, forest
 
-	invoke huffman_buffer_create, decompressed_size * 2
+	mov ebx, decompressed_size
+	add ebx, ebx
+	invoke huffman_buffer_create, ebx
 	mov data_buffer, eax
 	invoke compress_into_buffer, file_name, data_buffer, mappers
 	invoke get_compressed_size, data_buffer
@@ -94,7 +96,7 @@ compress proc uses eax ebx edx, file_name: ptr byte, password: ptr byte
 	invoke crt_strcpy, compressed_file_name, file_name
 	invoke append_tql, compressed_file_name
 	invoke write_into_file, info_buffer, data_buffer, compressed_file_name
-	invoke crt_printf, addr info_compressed_into
+	invoke crt_printf, offset info_compressed_into, addr file_name, addr compressed_file_name
 
 	invoke crt_free, md5_code
 	invoke pq_destroy, q
@@ -116,7 +118,7 @@ decompress proc, file_name: ptr byte, password: ptr byte
 	mov info_buffer, 0
 	invoke read_from_file, addr info_buffer, addr data_buffer, file_name
 	.if eax == 0
-		invoke crt_printf, addr failed_no_such_file
+		invoke crt_printf, addr failed_no_such_file, addr file_name
 		ret
 	.endif
 	invoke password_is_valid, password, info_buffer
@@ -149,7 +151,7 @@ decompress proc, file_name: ptr byte, password: ptr byte
 	mov decompressed_file_name[ebx], 0
 	
 	invoke write_into_file, 0, decompressed_buffer, decompressed_file_name
-	invoke crt_printf, addr info_decompressed_into
+	invoke crt_printf, addr info_decompressed_into, addr file_name, addr decompressed_file_name
 
 	invoke pq_destroy, q
 	invoke huffman_forest_destroy, forest
