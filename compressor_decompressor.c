@@ -210,6 +210,7 @@ typedef struct mapper {
 } mapper;
 
 extern mapper * mapper_init();
+
 //mapper * mapper_init() {
 //    mapper * mappers = (mapper *)malloc(sizeof(mapper) * 256);
 //    for (int i = 0; i < 256; ++i) {
@@ -269,182 +270,182 @@ typedef struct huffman_buffer {
     unsigned char * buffer;
 } huffman_buffer;
 
-extern huffman_buffer * huffman_buffer_create(int max_byte_count);
+//extern huffman_buffer * huffman_buffer_create(int max_byte_count);
 
-//huffman_buffer * huffman_buffer_create(int max_byte_count) {
-//    huffman_buffer * buffer = (huffman_buffer *)malloc(sizeof(huffman_buffer));
-//    buffer->current_bit_size = 0;
-//    buffer->byte_capacity = max_byte_count;
-//    //! 初始化为0
-//    buffer->buffer = (unsigned char *)malloc(max_byte_count * sizeof(unsigned char));
-//    memset(buffer->buffer, 0, max_byte_count);
-//    return buffer;
-//}
+huffman_buffer * huffman_buffer_create(int max_byte_count) {
+    huffman_buffer * buffer = (huffman_buffer *)malloc(sizeof(huffman_buffer));
+    buffer->current_bit_size = 0;
+    buffer->byte_capacity = max_byte_count;
+    //! 初始化为0
+    buffer->buffer = (unsigned char *)malloc(max_byte_count * sizeof(unsigned char));
+    memset(buffer->buffer, 0, max_byte_count);
+    return buffer;
+}
 
-extern void huffman_buffer_destroy(huffman_buffer * buffer);
+//extern void huffman_buffer_destroy(huffman_buffer * buffer);
 
-//void huffman_buffer_destroy(huffman_buffer * buffer) {
-//    if (buffer) {
-//        if (buffer->buffer) {
-//            free(buffer->buffer);
-//        }
-//        free(buffer);
-//    }
-//}
+void huffman_buffer_destroy(huffman_buffer * buffer) {
+    if (buffer) {
+        if (buffer->buffer) {
+            free(buffer->buffer);
+        }
+        free(buffer);
+    }
+}
 
-extern void huffman_buffer_insert(huffman_buffer * buffer, int bit_count, unsigned char * bits);
+//extern void huffman_buffer_insert(huffman_buffer * buffer, int bit_count, unsigned char * bits);
 
-//void huffman_buffer_insert(huffman_buffer * buffer, int bit_count, unsigned char * bits) {
-//    for (int i = 0; i < bit_count; ++i) {
-//        if (bits[i] == 1) {
-//            buffer->buffer[buffer->current_bit_size / 8] |= (0x1 << (buffer->current_bit_size % 8));
-//        }
-//        buffer->current_bit_size++;
-//    }
-//}
-
-// ------------------------------------------------------------------------------------------
-
-extern int get_compressed_size(huffman_buffer * data_buffer);
-
-//int get_compressed_size(huffman_buffer * data_buffer) {
-//    return data_buffer->current_bit_size / 8 + (data_buffer->current_bit_size % 8 ? 1 : 0);
-//}
-
-extern void compress_into_buffer(char * file_name, huffman_buffer * buffer, mapper * mappers);
-
-//void compress_into_buffer(char * file_name, huffman_buffer * buffer, mapper * mappers) {
-//    FILE * file_stream = NULL;
-//    if ((file_stream = fopen(file_name, "rb")) == NULL) {
-//        return;
-//    }
-//    int c = 0;
-//    while ((c = fgetc(file_stream)) != EOF) {
-//        huffman_buffer_insert(buffer, mappers[c].bit_length, mappers[c].bits);
-//    }
-//    fclose(file_stream);
-//    return;
-//}
-
-//#define DECODE_INFO_BUFFER_SIZE (2 * sizeof(int) + 16 + sizeof(int) * 256)
-
-extern void save_encode_info_into_buffer(huffman_buffer * buffer, int decompressed_size, int compressed_size, char * password, mapper * mappers);
-
-//void save_encode_info_into_buffer(huffman_buffer * buffer, int decompressed_size, int compressed_size, char * password, mapper * mappers ) {
-//    ((int *)(buffer->buffer))[0] = decompressed_size;
-//    ((int *)(buffer->buffer))[1] = compressed_size;
-//    char * password_offset = (char *)((int *)(buffer->buffer) + 2);
-//    for (int i = 0; i < 16; ++i) {
-//        password_offset[i] = password[i];
-//    }
-//    char * data_offset = password_offset + 16;
-//    for (int i = 0; i < 256; ++i) {
-//        ((int *)data_offset)[i] = mappers[i].weight;
-//    }
-//    buffer->current_bit_size += (DECODE_INFO_BUFFER_SIZE) << 3;
-//}
-
-extern void write_into_file(huffman_buffer * info_buffer, huffman_buffer * data_buffer, char * file_name);
-
-//void write_into_file(huffman_buffer * info_buffer, huffman_buffer * data_buffer, char * file_name) {
-//    FILE * file_stream = NULL;
-//    if ((file_stream = fopen(file_name, "wb")) == NULL) {
-//        return;
-//    }
-//    if (info_buffer) {
-//        int count = info_buffer->current_bit_size / 8 + (info_buffer->current_bit_size % 8 ? 1 : 0);
-//        for (int i = 0; i < count; ++i) {
-//            fputc(info_buffer->buffer[i], file_stream);
-//        }
-//    }
-//    if (data_buffer) {
-//        int count = data_buffer->current_bit_size / 8 + (data_buffer->current_bit_size % 8 ? 1 : 0);
-//        for (int i = 0; i < count; ++i) {
-//            fputc(data_buffer->buffer[i], file_stream);
-//        }
-//    }
-//    fclose(file_stream);
-//}
+void huffman_buffer_insert(huffman_buffer * buffer, int bit_count, unsigned char * bits) {
+    for (int i = 0; i < bit_count; ++i) {
+        if (bits[i] == 1) {
+            buffer->buffer[buffer->current_bit_size / 8] |= (0x1 << (buffer->current_bit_size % 8));
+        }
+        buffer->current_bit_size++;
+    }
+}
 
 // ------------------------------------------------------------------------------------------
 
-extern int read_from_file(huffman_buffer ** info_buffer, huffman_buffer ** data_buffer, char * file_name);
+//extern int get_compressed_size(huffman_buffer * data_buffer);
 
-// 传入指针指针作为返回值
-//int read_from_file(huffman_buffer ** info_buffer, huffman_buffer ** data_buffer, char * file_name) {
-//    // 从文件流中读取
-//    FILE * file_stream = NULL;
-//    if ((file_stream = fopen(file_name, "rb")) == NULL) {
-//        return 0;
-//    }
-//    if (info_buffer) {
-//        *info_buffer = huffman_buffer_create(DECODE_INFO_BUFFER_SIZE);
-//        for (int i = 0; i < DECODE_INFO_BUFFER_SIZE; ++i) {
-//            (*info_buffer)->buffer[i] = (unsigned char)fgetc(file_stream);
-//        }
-//    }
-//    if (data_buffer) {
-//        int size = ((int *)((*info_buffer)->buffer))[1];
-//        *data_buffer = huffman_buffer_create(size);
-//        for (int i = 0; i < size; ++i) {
-//            (*data_buffer)->buffer[i] = (unsigned char)fgetc(file_stream);
-//        }
-//    }
-//    fclose(file_stream);
-//    return 1;
-//}
+int get_compressed_size(huffman_buffer * data_buffer) {
+    return data_buffer->current_bit_size / 8 + (data_buffer->current_bit_size % 8 ? 1 : 0);
+}
 
-extern pq * rebuild_pq(huffman_buffer * info_buffer);
+//extern void compress_into_buffer(char * file_name, huffman_buffer * buffer, mapper * mappers);
 
-//pq * rebuild_pq(huffman_buffer * info_buffer) {
-//    // 初始化 pq
-//    pq * q = pq_create();
-//    huffman_node * nodes[256];
-//    char * data_offset = info_buffer->buffer + 2 * sizeof(int) + 16;
-//    for (int i = 0; i < 256; ++i) {
-//        nodes[i] = huffman_node_create_external_node(i);
-//        nodes[i]->weight = ((int *)data_offset)[i];
-//    }
-//    // 建堆
-//    for (int i = 0; i < 256; ++i) {
-//        pq_insert(q, nodes[i]);
-//    }
-//    return q;
-//}
+void compress_into_buffer(char * file_name, huffman_buffer * buffer, mapper * mappers) {
+    FILE * file_stream = NULL;
+    if ((file_stream = fopen(file_name, "rb")) == NULL) {
+        return;
+    }
+    int c = 0;
+    while ((c = fgetc(file_stream)) != EOF) {
+        huffman_buffer_insert(buffer, mappers[c].bit_length, mappers[c].bits);
+    }
+    fclose(file_stream);
+    return;
+}
 
-extern unsigned char huffman_buffer_get_next_bit(huffman_buffer * data_buffer);
+#define DECODE_INFO_BUFFER_SIZE (2 * sizeof(int) + 16 + sizeof(int) * 256)
 
-//unsigned char huffman_buffer_get_next_bit(huffman_buffer * data_buffer) {
-//    unsigned char ret = !!(data_buffer->buffer[data_buffer->current_bit_size / 8]
-//        & (0x1 << (data_buffer->current_bit_size % 8)));
-//    data_buffer->current_bit_size++;
-//    return ret;
-//}
+//extern void save_encode_info_into_buffer(huffman_buffer * buffer, int decompressed_size, int compressed_size, char * password, mapper * mappers);
 
-extern unsigned char huffman_buffer_get_next_byte(huffman_buffer * data_buffer, huffman_node * forest);
+void save_encode_info_into_buffer(huffman_buffer * buffer, int decompressed_size, int compressed_size, char * password, mapper * mappers ) {
+    ((int *)(buffer->buffer))[0] = decompressed_size;
+    ((int *)(buffer->buffer))[1] = compressed_size;
+    char * password_offset = (char *)((int *)(buffer->buffer) + 2);
+    for (int i = 0; i < 16; ++i) {
+        password_offset[i] = password[i];
+    }
+    char * data_offset = password_offset + 16;
+    for (int i = 0; i < 256; ++i) {
+        ((int *)data_offset)[i] = mappers[i].weight;
+    }
+    buffer->current_bit_size += (DECODE_INFO_BUFFER_SIZE) << 3;
+}
 
-//unsigned char huffman_buffer_get_next_byte(huffman_buffer * data_buffer, huffman_node * forest) {
-//    // 注意，此棵huffman树不是规整的左0右1，根节点是正常的左孩子，根节点右孩子还是正常的右孩子，其余一致
-//    huffman_node * current = huffman_buffer_get_next_bit(data_buffer) ? forest->right_child : forest;
-//    while (current->left_child || current->right_child) {
-//        unsigned char bit = huffman_buffer_get_next_bit(data_buffer);
-//        current = bit == 0 ? current->left_child : current->right_child;
-//    }
-//    return current->key;
-//}
+//extern void write_into_file(huffman_buffer * info_buffer, huffman_buffer * data_buffer, char * file_name);
 
-extern huffman_buffer * decompress_into_buffer(huffman_buffer * info_buffer, huffman_buffer * data_buffer, huffman_node * forest);
+void write_into_file(huffman_buffer * info_buffer, huffman_buffer * data_buffer, char * file_name) {
+    FILE * file_stream = NULL;
+    if ((file_stream = fopen(file_name, "wb")) == NULL) {
+        return;
+    }
+    if (info_buffer) {
+        int count = info_buffer->current_bit_size / 8 + (info_buffer->current_bit_size % 8 ? 1 : 0);
+        for (int i = 0; i < count; ++i) {
+            fputc(info_buffer->buffer[i], file_stream);
+        }
+    }
+    if (data_buffer) {
+        int count = data_buffer->current_bit_size / 8 + (data_buffer->current_bit_size % 8 ? 1 : 0);
+        for (int i = 0; i < count; ++i) {
+            fputc(data_buffer->buffer[i], file_stream);
+        }
+    }
+    fclose(file_stream);
+}
 
-//huffman_buffer * decompress_into_buffer(huffman_buffer * info_buffer, huffman_buffer * data_buffer, huffman_node * forest) {
-//    int decompressed_size = ((int *)(info_buffer->buffer))[0];
-//    huffman_buffer * decompressed_buffer = huffman_buffer_create(decompressed_size);
-//    for (int i = 0; i < decompressed_size; ++i) {
-//        unsigned char c = huffman_buffer_get_next_byte(data_buffer, forest);
-//        decompressed_buffer->buffer[i] = c;
-//        decompressed_buffer->current_bit_size = (i + 1) << 3;
-//    }
-//    return decompressed_buffer;
-//}
+// ------------------------------------------------------------------------------------------
+
+//extern int read_from_file(huffman_buffer ** info_buffer, huffman_buffer ** data_buffer, char * file_name);
+
+//传入指针指针作为返回值
+int read_from_file(huffman_buffer ** info_buffer, huffman_buffer ** data_buffer, char * file_name) {
+    // 从文件流中读取
+    FILE * file_stream = NULL;
+    if ((file_stream = fopen(file_name, "rb")) == NULL) {
+        return 0;
+    }
+    if (info_buffer) {
+        *info_buffer = huffman_buffer_create(DECODE_INFO_BUFFER_SIZE);
+        for (int i = 0; i < DECODE_INFO_BUFFER_SIZE; ++i) {
+            (*info_buffer)->buffer[i] = (unsigned char)fgetc(file_stream);
+        }
+    }
+    if (data_buffer) {
+        int size = ((int *)((*info_buffer)->buffer))[1];
+        *data_buffer = huffman_buffer_create(size);
+        for (int i = 0; i < size; ++i) {
+            (*data_buffer)->buffer[i] = (unsigned char)fgetc(file_stream);
+        }
+    }
+    fclose(file_stream);
+    return 1;
+}
+
+//extern pq * rebuild_pq(huffman_buffer * info_buffer);
+
+pq * rebuild_pq(huffman_buffer * info_buffer) {
+    // 初始化 pq
+    pq * q = pq_create();
+    huffman_node * nodes[256];
+    char * data_offset = info_buffer->buffer + 2 * sizeof(int) + 16;
+    for (int i = 0; i < 256; ++i) {
+        nodes[i] = huffman_node_create_external_node(i);
+        nodes[i]->weight = ((int *)data_offset)[i];
+    }
+    // 建堆
+    for (int i = 0; i < 256; ++i) {
+        pq_insert(q, nodes[i]);
+    }
+    return q;
+}
+
+//extern unsigned char huffman_buffer_get_next_bit(huffman_buffer * data_buffer);
+
+unsigned char huffman_buffer_get_next_bit(huffman_buffer * data_buffer) {
+    unsigned char ret = !!(data_buffer->buffer[data_buffer->current_bit_size / 8]
+        & (0x1 << (data_buffer->current_bit_size % 8)));
+    data_buffer->current_bit_size++;
+    return ret;
+}
+
+//extern unsigned char huffman_buffer_get_next_byte(huffman_buffer * data_buffer, huffman_node * forest);
+
+unsigned char huffman_buffer_get_next_byte(huffman_buffer * data_buffer, huffman_node * forest) {
+    // 注意，此棵huffman树不是规整的左0右1，根节点是正常的左孩子，根节点右孩子还是正常的右孩子，其余一致
+    huffman_node * current = huffman_buffer_get_next_bit(data_buffer) ? forest->right_child : forest;
+    while (current->left_child || current->right_child) {
+        unsigned char bit = huffman_buffer_get_next_bit(data_buffer);
+        current = bit == 0 ? current->left_child : current->right_child;
+    }
+    return current->key;
+}
+
+//extern huffman_buffer * decompress_into_buffer(huffman_buffer * info_buffer, huffman_buffer * data_buffer, huffman_node * forest);
+
+huffman_buffer * decompress_into_buffer(huffman_buffer * info_buffer, huffman_buffer * data_buffer, huffman_node * forest) {
+    int decompressed_size = ((int *)(info_buffer->buffer))[0];
+    huffman_buffer * decompressed_buffer = huffman_buffer_create(decompressed_size);
+    for (int i = 0; i < decompressed_size; ++i) {
+        unsigned char c = huffman_buffer_get_next_byte(data_buffer, forest);
+        decompressed_buffer->buffer[i] = c;
+        decompressed_buffer->current_bit_size = (i + 1) << 3;
+    }
+    return decompressed_buffer;
+}
 
 // ------------------------------------------------------------------------------------------
 
@@ -475,94 +476,95 @@ extern int password_is_valid(char * input_password, huffman_buffer * info_buffer
 
 // ------------------------------------------------------------------------------------------
 
-extern void compress(char * file_name, char * password);
+//extern void compress(char * file_name, char * password);
 
-//void compress(char * file_name, char * password) {
-//    char * md5_code = md5(password ? password : "");
-//    int decompressed_size = 0;
-//    pq * q = char_statistics(file_name, &decompressed_size);
-//    if (!q) {
-//        printf("[ FAILED ]: No such file named [ %s ] ...\n", file_name);
-//        return;
-//    }
-//    printf("[ INFO ]: Compressing ...\n");
-//    huffman_forest * forest = huffman_forest_create(q);
-//    mapper * mappers = mapper_init();
-//    mapper_set_all(mappers, forest);
-//
-//    huffman_buffer * data_buffer = huffman_buffer_create(decompressed_size * 2); // 经验值 emmmmm
-//    compress_into_buffer(file_name, data_buffer, mappers);
-//    int compressed_size = get_compressed_size(data_buffer);
-//    huffman_buffer * info_buffer = huffman_buffer_create(DECODE_INFO_BUFFER_SIZE);
-//    save_encode_info_into_buffer(info_buffer, decompressed_size, compressed_size, md5_code, mappers);
-//    
-//    char * compressed_file_name = (char *)malloc(strlen(file_name) + 4 + 1);
-//    strcpy(compressed_file_name, file_name);
-//    strcat(compressed_file_name, ".tql");
-//    write_into_file(info_buffer, data_buffer, compressed_file_name);
-//    printf("[ INFO ]: File [ %s ] was compressed into [ %s ] successfully...\n", file_name, compressed_file_name);
-//
-//    free(md5_code);
-//    pq_destroy(q);
-//    huffman_forest_destroy(forest);
-//    mapper_destroy(mappers);
-//    huffman_buffer_destroy(data_buffer);
-//    huffman_buffer_destroy(info_buffer);
-//    free(compressed_file_name);
-//}
+void compress(char * file_name, char * password) {
+    char * md5_code = md5(password ? password : "");
+    int decompressed_size = 0;
+    pq * q = char_statistics(file_name, &decompressed_size);
+    if (!q) {
+        printf("[ FAILED ]: No such file named [ %s ] ...\n", file_name);
+        return;
+    }
+    printf("[ INFO ]: Compressing ...\n");
+    huffman_forest * forest = huffman_forest_create(q);
+    mapper * mappers = mapper_init();
+    mapper_set_all(mappers, forest);
 
-extern void decompress(char * file_name, char * password);
+    huffman_buffer * data_buffer = huffman_buffer_create(decompressed_size * 2); // 经验值 emmmmm
+    compress_into_buffer(file_name, data_buffer, mappers);
+    int compressed_size = get_compressed_size(data_buffer);
+    huffman_buffer * info_buffer = huffman_buffer_create(DECODE_INFO_BUFFER_SIZE);
+    save_encode_info_into_buffer(info_buffer, decompressed_size, compressed_size, md5_code, mappers);
+    
+    char * compressed_file_name = (char *)malloc(strlen(file_name) + 4 + 1);
+    strcpy(compressed_file_name, file_name);
+    strcat(compressed_file_name, ".tql");
+    write_into_file(info_buffer, data_buffer, compressed_file_name);
+    printf("[ INFO ]: File [ %s ] was compressed into [ %s ] successfully...\n", file_name, compressed_file_name);
 
-//void decompress(char * file_name, char * password) {
-//    huffman_buffer * data_buffer = NULL, *info_buffer = NULL;
-//    if (!read_from_file(&info_buffer, &data_buffer, file_name)) {
-//        printf("[ FAILED ]: No such file named [ %s ] ...\n", file_name);
-//        return;
-//    }
-//    if (!password_is_valid(password ? password : "", info_buffer)) {
-//        printf("[ FAILED ]: You have NO permission to decompress the file.\n");
-//        huffman_buffer_destroy(data_buffer);
-//        huffman_buffer_destroy(info_buffer);
-//        return;
-//    }
-//    else {
-//        printf("[ INFO ]: Decompressing ...\n");
-//    }
-//
-//    pq * q = rebuild_pq(info_buffer);
-//    huffman_forest * forest = huffman_forest_create(q);
-//    huffman_buffer * decompressed_buffer = decompress_into_buffer(info_buffer, data_buffer, forest);
-//    mapper * mappers = mapper_init();
-//    mapper_set_all(mappers, forest);
-//
-//    char * decompressed_file_name = (char *)malloc(strlen(file_name) + 1);
-//    strcpy(decompressed_file_name, file_name);
-//    decompressed_file_name[strlen(file_name) - 4] = 0;
-//
-//    write_into_file(NULL, decompressed_buffer, decompressed_file_name);
-//    printf("[ INFO ]: File [ %s ] was decompressed into [ %s ] successfully...\n", file_name, decompressed_file_name);
-//
-//    pq_destroy(q);
-//    huffman_forest_destroy(forest);
-//    huffman_buffer_destroy(decompressed_buffer);
-//    mapper_destroy(mappers);
-//    free(decompressed_file_name);
-//}
+    free(md5_code);
+    pq_destroy(q);
+    huffman_forest_destroy(forest);
+    mapper_destroy(mappers);
+    huffman_buffer_destroy(data_buffer);
+    huffman_buffer_destroy(info_buffer);
+    free(compressed_file_name);
+}
 
-extern void usage();
+//extern void decompress(char * file_name, char * password);
 
-//void usage() {
-//    printf("Usage:\n");
-//    printf("  compress filename\n");    
-//    printf("  decompress filename\n");
-//    printf("  compress filename [ -p password ]\n");
-//    printf("  decompress filename [ -p password ]\n");
-//}
+void decompress(char * file_name, char * password) {
+    huffman_buffer * data_buffer = NULL, *info_buffer = NULL;
+    if (!read_from_file(&info_buffer, &data_buffer, file_name)) {
+        printf("[ FAILED ]: No such file named [ %s ] ...\n", file_name);
+        return;
+    }
+    if (!password_is_valid(password ? password : "", info_buffer)) {
+        printf("[ FAILED ]: You have NO permission to decompress the file.\n");
+        huffman_buffer_destroy(data_buffer);
+        huffman_buffer_destroy(info_buffer);
+        return;
+    }
+    else {
+        printf("[ INFO ]: Decompressing ...\n");
+    }
+
+    pq * q = rebuild_pq(info_buffer);
+    huffman_forest * forest = huffman_forest_create(q);
+    huffman_buffer * decompressed_buffer = decompress_into_buffer(info_buffer, data_buffer, forest);
+    mapper * mappers = mapper_init();
+    mapper_set_all(mappers, forest);
+
+    char * decompressed_file_name = (char *)malloc(strlen(file_name) + 1);
+    strcpy(decompressed_file_name, file_name);
+    decompressed_file_name[strlen(file_name) - 4] = 0;
+
+    write_into_file(NULL, decompressed_buffer, decompressed_file_name);
+    printf("[ INFO ]: File [ %s ] was decompressed into [ %s ] successfully...\n", file_name, decompressed_file_name);
+
+    pq_destroy(q);
+    huffman_forest_destroy(forest);
+    huffman_buffer_destroy(decompressed_buffer);
+    mapper_destroy(mappers);
+    free(decompressed_file_name);
+}
+
+//extern void usage();
+
+void usage() {
+    printf("Usage:\n");
+    printf("  compress filename\n");    
+    printf("  decompress filename\n");
+    printf("  compress filename [ -p password ]\n");
+    printf("  decompress filename [ -p password ]\n");
+}
 
 // ------------------------------------------------------------------------------------------
 
 int main(int argc, char * argv[]) {
     compress("山河入梦.txt", "hahah");
+	decompress("山河入梦.txt.tql", "hahah");
     if (argc == 3) {
         if (strcmp(argv[1], "compress") == 0) {
             compress(argv[2], NULL);

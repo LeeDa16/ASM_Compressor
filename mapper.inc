@@ -18,6 +18,6 @@ mapper_destroy proto, mappers: ptr mapper
 
 mapper_set proto, mappers: ptr mapper, order: byte, bit_length: sdword, bits: ptr byte, weight: sdword
 
-_mapper_set_all proto, mappers: ptr mapper, forest: ptr huffman_node, depth: sdword, bits: ptr byte
+;_mapper_set_all proto, mappers: ptr mapper, forest: ptr huffman_node, depth: sdword, bits: ptr byte
 
-mapper_set_all proto, mappers: ptr mapper, forest: ptr huffman_node
+;mapper_set_all proto, mappers: ptr mapper, forest: ptr huffman_node

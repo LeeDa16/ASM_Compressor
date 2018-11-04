@@ -25,32 +25,40 @@ calc_md5 endp
 ;
 
 md5 proc, password: ptr byte
-	local len: sdword
+	local len: sdword, md5_code: ptr byte
 	invoke crt_strlen, password
 	mov len, eax
 	invoke crt_malloc, 16
-	invoke calc_md5, len, password, eax
+	mov md5_code, eax
+	invoke calc_md5, len, password, md5_code
 	ret
 md5 endp
 
 password_is_valid proc uses ecx edx ebx, input_password: ptr byte, info_buffer: ptr huffman_buffer
 	local md5_stored: ptr byte, md5_input: ptr byte
 	;mov eax, 0
-	;是否需要对eax的置零操作？
-	mov eax, (huffman_buffer ptr info_buffer).buffer + 8 ;2 *sizeof(int)
+	;是否需要对eax的置零操作?
+	mov eax, info_buffer ;2 *sizeof(int)
+	add eax, 16
 	mov md5_stored, eax
 	invoke md5, input_password
 	mov md5_input, eax
+	mov eax, md5_stored
+	mov edx, md5_input
 	mov ecx, 16
-L1: mov edx, ecx
-	dec edx
-	mov ebx, md5_stored[edx]
-	.if ebx != md5_input[edx]
-		mov eax, 0
-		ret
-	.endif
+L1: dec ecx
+	mov bl, byte ptr [eax + ecx]
+	mov bh, byte ptr [edx + ecx]
+	cmp bl, bh
+	jne ret0
+	inc ecx
 	loop L1
 	invoke crt_free, md5_input
+	jmp ret1
+ret0:
+	mov eax, 0
+	ret
+ret1:
 	mov eax, 1
 	ret
 password_is_valid endp

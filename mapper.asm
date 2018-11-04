@@ -33,21 +33,24 @@ return:
 mapper_destroy endp
 
 
-mapper_set proc uses ecx ebx esi, mappers: ptr mapper, order: byte, 
+mapper_set proc uses ecx ebx esi eax, mappers: ptr mapper, order: byte, 
 	bit_length: sdword, bits: ptr byte, weight: sdword
 	mov esi, mappers
 	mov eax, size mapper
-	mul order
+	movzx ebx, order
+	mul ebx
 	add esi, eax
 	mov ebx, bit_length
 	mov (mapper ptr [esi]).bit_length, ebx
 	mov ebx, weight
 	mov (mapper ptr [esi]).weight, ebx
 	mov ecx, bit_length
+	mov eax, bits
 l1: 
-	mov bh, byte ptr bits[ecx]
-	mov (mapper ptr [esi]).bits[ecx - 1], bh
+	mov bl, byte ptr [eax + ecx - 1]
+	mov byte ptr [esi + ecx + 3], bl
 	loop l1
+
 	ret
 mapper_set endp
 
@@ -59,7 +62,7 @@ _mapper_set_all proc, mappers: ptr mapper, forest: ptr huffman_node, depth: sdwo
 	jne lc
 	mov eax, forest
 	; (!(forest->left_child) && !(forest->right_child))
-	cmp dword ptr [eax + 9],0
+	cmp dword ptr [eax + 9], 0
 	jne lc
 
 	; mapper_set(mappers, forest->key, depth + 1, bits, forest->weight)
@@ -132,12 +135,10 @@ return:
 _mapper_set_all endp
 
 
-mapper_set_all proc uses ecx, mappers: ptr mapper, forest: ptr huffman_node
+mapper_set_all proc uses ecx ebx, mappers: ptr mapper, forest: ptr huffman_node
 	local bits[256]: byte 
-	mov ecx, 256
-l1: 
-	mov bits[ecx - 1], 0
-	loop l1
+	;mov ecx, 256
+	invoke crt_memset, addr bits, 0, 256
 	invoke _mapper_set_all, mappers, forest, 0, addr bits
 	ret
 mapper_set_all endp
