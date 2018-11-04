@@ -84,13 +84,13 @@
 
 ### 1. 压缩
 
-![1541331678208](C:\Users\STEVE\AppData\Roaming\Typora\typora-user-images\1541331678208.png)
+![1541331678208](img/compress.png)
 
 
 
 ### 2. 解压
 
-![1541331719479](C:\Users\STEVE\AppData\Roaming\Typora\typora-user-images\1541331719479.png)
+![1541331719479](img/decompress.png)
 
 
 

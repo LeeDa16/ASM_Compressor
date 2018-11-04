@@ -1,0 +1,48 @@
+﻿  Assembling huffman_buffer.asm...
+mapper.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(3): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(3): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+  Assembling huffman_forest.asm...
+priority_queue.inc(3): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+  Assembling huffman_node.asm...
+  Assembling main.asm...
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(3): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(3): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+mapper.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(3): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_buffer.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+mapper.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(3): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(3): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+md5.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(3): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+  Assembling mapper.asm...
+priority_queue.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(3): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+  Assembling md5.asm...
+priority_queue.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+priority_queue.inc(3): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+  Assembling priority_queue.asm...
+priority_queue.inc(3): warning A4011: multiple .MODEL directives found : .MODEL ignored
+huffman_node.inc(1): warning A4011: multiple .MODEL directives found : .MODEL ignored
+  Compressor-Decompressor.vcxproj -> C:\Users\STEVE\Desktop\大三上\计算机与网络体系结构(2)\作业\Compressor-Decompressor\Debug\Compressor-Decompressor-Asm.exe
